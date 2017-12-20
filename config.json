@@ -1,0 +1,34 @@
+{
+	"sqlConfig": {
+		"options": {
+			"define": {
+				"timestamps": true,
+				"updatedAt": "update_time",
+				"createdAt": "create_time",
+				"deletedAt": false
+			},
+			"timezone": "+08:00",
+			"host": "192.168.109.199",
+			"dialect": "mysql",
+			"dialectOptions": {
+				"charset": "utf8mb4"
+			},
+			"pool": {
+				"max": 10,
+				"min": 0,
+				"idle": 10000
+			}
+		},
+		"user": "root",
+		"password": "Admin12345*",
+		"database": "ebook_services2.0"
+	},
+	"redisConfig": {
+		"port": 6379,
+		"host": "192.168.109.161",
+		"keyPrefix": "etzr"
+	},
+	"umsApiConfig": {
+		"ums_url": "http://ums.tes-sys.com/ums-api"
+	}
+}

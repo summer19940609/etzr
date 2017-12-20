@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title><%=title%></title>
+</head>
+<script>
+var etzrUrl = "<%=url%>";
+</script>
+
+<body>
+    <h1>注册账号</h1> 
+    学号：<input type="text" id="adminName"><br> 
+    密码：<input type="password" id="password"><br>
+    确认密码：<input type="password" id="rePassword"><br>
+    <button id="adminLoginBtn">点击注册</button>
+</body>
+<script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+
+<script>
+  $("#adminLoginBtn").on("click", function() {
+      var adminName = $("#adminName").val();
+      var password = $("#password").val();
+      var rePassword = $("#rePassword").val();
+      if (password != rePassword) {
+        alert("两次密码不一致，请重新输入");
+        return false;
+      }
+      $.ajax({
+          url: etzrUrl + '/admin/register',
+          type: 'POST',
+          dataType: 'json',
+          data: {
+            username: adminName,
+            password: password
+          }
+        })
+        .done(function(info) {
+          alert(info.message);
+          window.location.href = "/etzr_services/admin_login"
+        })
+        .fail(function(info) {
+          alert(info.message);
+          window.location.href = "/etzr_services/register";
+        })
+        .always(function() {
+          console.log("complete");
+        });
+  })
+</script>
