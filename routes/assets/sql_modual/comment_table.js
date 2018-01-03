@@ -1,5 +1,5 @@
 module.exports = function(sequelize, DataTypes) {
-  return sequelize.define('Comment_table', {
+  return sequelize.define('comment_table', {
     id: {
       type: DataTypes.STRING,
       allowNull: false,

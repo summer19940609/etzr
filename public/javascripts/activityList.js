@@ -1,4 +1,7 @@
 $(document).ready(function() {
+  var userData = localStorage.getItem('userData');
+  var name = JSON.parse(userData).name;
+  $(".username").empty().text(name);
   var page = 1;
   currentPage = 1;
   var url = etzrUrl + '/activity/list';
@@ -15,6 +18,10 @@ $(document).ready(function() {
       }
     })
     .done(function(info) {
+      if (!info.flag) {
+        $("#activityList").empty().append('<tr><td colspan="5">查询错误</td></tr>');
+        return false;
+      }
       if (!info.data) {
         $("#activityList").empty().append('<tr><td colspan="5">列表为空</td></tr>');
         return false;
@@ -112,6 +119,10 @@ $("#activityPageNum").on("click", '.page_num', function() {
       }
     })
     .done(function(info) {
+      if (!info.flag) {
+        $("#activityList").empty().append('<tr><td colspan="5">查询错误</td></tr>');
+        return false;
+      }
       if (!info.data) {
         $("#activityList").empty().append('<tr><td colspan="5">列表为空</td></tr>');
         return false;

@@ -1,5 +1,5 @@
 module.exports = function(sequelize, DataTypes) {
-  return sequelize.define('Thumbsup_table', {
+  return sequelize.define('thumbsup_table', {
     id: {
       type: DataTypes.STRING,
       allowNull: false,

@@ -36,6 +36,9 @@ var currentPage;
 
 
 $(document).ready(function() {
+  var userData = localStorage.getItem('userData');
+  var name = JSON.parse(userData).name;
+  $(".username").empty().text(name);
   var page = 1;
   currentPage = 1;
   var url = etzrUrl + '/teacher/list';
@@ -52,6 +55,10 @@ $(document).ready(function() {
       }
     })
     .done(function(info) {
+      if (!info.flag) {
+        $("#teacherList").empty().append('<tr><td colspan="6">查询错误</td></tr>');
+        return false;
+      }
       if (!info.data) {
         $("#teacherList").empty().append('<tr><td colspan="6">列表为空</td></tr>');
         return false;
@@ -111,6 +118,10 @@ $("#teacherPageNum").on('click', '.page_num', function() {
       }
     })
     .done(function(info) {
+      if (!info.flag) {
+        $("#teacherList").empty().append('<tr><td colspan="6">查询错误</td></tr>');
+        return false;
+      }
       if (!info.data) {
         $("#teacherList").empty().append('<tr><td colspan="6">列表为空</td></tr>');
         return false;

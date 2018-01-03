@@ -1,5 +1,5 @@
 module.exports = function(sequelize, DataTypes) {
-  return sequelize.define('Resouce_table', {
+  return sequelize.define('resouce_table', {
     id: {
       type: DataTypes.STRING,
       allowNull: false,

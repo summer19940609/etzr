@@ -8,7 +8,7 @@
 				"deletedAt": false
 			},
 			"timezone": "+08:00",
-			"host": "192.168.109.199",
+			"host": "localhost",
 			"dialect": "mysql",
 			"dialectOptions": {
 				"charset": "utf8mb4"
@@ -30,5 +30,6 @@
 	},
 	"umsApiConfig": {
 		"ums_url": "http://ums.tes-sys.com/ums-api"
-	}
+	},
+	"systemCode": "etzr"	
 }

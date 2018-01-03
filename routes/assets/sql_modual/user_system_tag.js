@@ -1,5 +1,5 @@
 module.exports = function(sequelize, DataTypes) {
-  return sequelize.define('User_system_tag', {
+  return sequelize.define('user_system_tag', {
     id: {
       type: DataTypes.STRING,
       allowNull: false,

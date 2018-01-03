@@ -1,5 +1,5 @@
 module.exports = function(sequelize, DataTypes) {
-  return sequelize.define('Postings_table', {
+  return sequelize.define('postings_table', {
     id: {
       type: DataTypes.STRING,
       allowNull: false,
@@ -13,13 +13,6 @@ module.exports = function(sequelize, DataTypes) {
       autoIncrement: false,
       primaryKey: false,
       defaultValue: null
-    },
-    resource_flag: {
-      type: DataTypes.INTEGER(1),
-      allowNull: true,
-      autoIncrement: false,
-      primaryKey: false,
-      defaultValue: 0
     },
     title: {
       type: DataTypes.STRING,
@@ -104,6 +97,13 @@ module.exports = function(sequelize, DataTypes) {
       autoIncrement: false,
       primaryKey: false,
       defaultValue: null
+    },
+    resource_flag: {
+      type: DataTypes.INTEGER(1),
+      allowNull: true,
+      autoIncrement: false,
+      primaryKey: false,
+      defaultValue: 0
     },
     del_flag: {
       type: DataTypes.INTEGER(1),

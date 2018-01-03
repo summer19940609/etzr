@@ -2,32 +2,53 @@ var currentPage;
 var currentCheckPage;
 
 /*加载第一页*/
-$(document).ready(function() {
+$(document).ready(function () {
   var page = 1;
   currentPage = 1;
   currentCheckPage = 1;
   var order = "DESC";
-  var orderType = "new_create_time";
-  var url = etzrUrl + '/diary/list';
-  listPass(url, page, order, orderType);
-  listChecking(url, page, order, orderType);
+  var orderType = "p.new_create_time";
+  var url = etzrUrl + '/diary/admin/list';
+  var userData = localStorage.getItem("userData");
+  if (!userData) {
+    return false;
+  }
+  var name = JSON.parse(userData).name;
+  $(".username").empty().text(name);
+  var className = JSON.parse(userData).className;
+  if (!className) {
+    return false;
+  }
+  listPass(url, page, order, orderType, className);
+  listChecking(url, page, order, orderType, className);
 });
 
-function listChecking(url, page, order, orderType) {
+function listChecking(url, page, order, orderType, className) {
+  var classNameArr = className.split(',');
+  classNameArr.push(className);
+  
+  var obj = {
+    page: page,
+    order: order,
+    orderType: orderType,
+    user_id: user_id,
+    pass_flag: 0,
+    token: token,
+    className: classNameArr
+  }
+  // ajax发送数组的方法，约定处理格式为json
   $.ajax({
       url: url,
       type: 'POST',
       dataType: 'json',
-      data: {
-        page: page,
-        order: order,
-        orderType: orderType,
-        user_id: user_id,
-        pass_flag: 0,
-        token: token
-      }
+      data: JSON.stringify(obj),
+      contentType: "application/json",
     })
-    .done(function(info) {
+    .done(function (info) {
+      if (!info.flag) {
+        $("#diaryNotPass").empty().append('<tr><td colspan="5">查询错误</td></tr>');
+        return false;
+      }
       if (!info.data) {
         $("#diaryNotPass").empty().append('<tr><td colspan="5">无数据</td></tr>');
         return false;
@@ -41,45 +62,59 @@ function listChecking(url, page, order, orderType) {
       $("#pageNumArea-checking").empty().append(pageNumStr);
       $("#pageNumArea-checking").find("li").eq(Number(currentCheckPage) - 1).addClass("active");
       var diaryStr = "";
-      $.each(info.data, function(index, el) {
+      $.each(info.data, function (index, el) {
         var imgStr = "";
         if (!el.imgData.length) {
           imgStr = "无图片";
         } else {
-          var imgData = JSON.parse(JSON.stringify(el.imgData));
+          var imgData = el.imgData.split(',');
+          console.log(imgData);
           for (var i = 0; i < imgData.length; i++) {
-            imgStr += '<a style="margin-right: 10px;" href="' + imgData[i].resource_url + '" target="_blank"><img alt="无法显示" src="' + imgData[i].resource_url + '" style="width: 40px;"></a>';
+            imgStr += '<a style="margin-right: 10px;" href="' + imgData[i] + '" target="_blank"><img alt="无法显示" src="' + imgData[i] + '" style="width: 40px;"></a>';
           }
         }
         var str = '<tr id="' + el.id + '"><td>' + el.real_name + '</td><td>' + el.content + '</td><td>' + diaryWeather[el.otherfield] + '</td><td>' + imgStr + '</td><td><button class="btn btn-danger delete" rel="' + el.id + '">删除</button><button class="btn btn-primary pass" rel="' + el.id + '">通过审核</button></td></tr>'
         diaryStr += str;
       });
-      $("#diaryNotPass").append(diaryStr);
+      $("#diaryNotPass").empty().append(diaryStr);
     })
-    .fail(function(info) {
+    .fail(function (info) {
       console.log(info.message);
     })
-    .always(function() {
+    .always(function () {
       console.log("complete");
     });
 }
 
 
-function listPass(url, page, order, orderType) {
+function listPass(url, page, order, orderType, className) {
+  // className的转换成数组形式，例如
+  // '三年级,四年级'  ===>  ['三年级','四年级','三年级,四年级']
+  var classNameArr = className.split(',');
+  classNameArr.push(className);
+  // classNameArr = ['四年级', '三年级', '四年级,三年级']
+  var obj = {
+    page: page,
+    order: order,
+    orderType: orderType,
+    user_id: user_id,
+    pass_flag: 1,
+    token: token,
+    className: classNameArr
+  }
+  // ajax发送数组的方法，约定处理格式为json
   $.ajax({
       url: url,
       type: 'POST',
       dataType: 'json',
-      data: {
-        page: page,
-        order: order,
-        orderType: orderType,
-        user_id: user_id,
-        pass_flag: 1,
-        token: token
-      }
+      data: JSON.stringify(obj),
+      contentType: "application/json",
     })
-    .done(function(info) {
+    .done(function (info) {
+      if (!info.flag) {
+        $("#diaryPass").empty().append('<tr><td colspan="6">查询错误</td></tr>');
+        return false;
+      }
       if (!info.data) {
         $("#diaryPass").empty().append('<tr><td colspan="6">列表为空</td></tr>');
         return false;
@@ -93,14 +128,14 @@ function listPass(url, page, order, orderType) {
       $("#pageNumArea").empty().append(pageNumStr);
       $("#pageNumArea").find("li").eq(Number(currentPage) - 1).addClass("active");
       var diaryStr = "";
-      $.each(info.data, function(index, el) {
+      $.each(info.data, function (index, el) {
         var imgStr = "";
-        if (!el.imgData.length) {
+        if (!el.imgData) {
           imgStr = '无图片';
         } else {
-          var imgData = JSON.parse(JSON.stringify(el.imgData));
+          var imgData = el.imgData.split(',');
           for (var i = 0; i < imgData.length; i++) {
-            imgStr += '<a style="margin-right: 10px;" href="' + imgData[i].resource_url + '" target="_blank"><img alt="无法显示" src="' + imgData[i].resource_url + '" style="width: 40px;"></a>';
+            imgStr += '<a style="margin-right: 10px;" href="' + imgData[i] + '" target="_blank"><img alt="无法显示" src="' + imgData[i] + '" style="width: 40px;"></a>';
           }
         }
         var th_message = el.likeStatus ? "点赞" : "取消点赞";
@@ -109,16 +144,16 @@ function listPass(url, page, order, orderType) {
       });
       $("#diaryPass").empty().append(diaryStr);
     })
-    .fail(function(info) {
+    .fail(function (info) {
       console.log(info.message);
     })
-    .always(function() {
+    .always(function () {
       console.log("complete");
     });
 }
 
 /*点击页码*/
-$("#pageNumArea").on('click', '.page_num', function(event) {
+$("#pageNumArea").on('click', '.page_num', function (event) {
   $("#pageNumArea").find("li").eq(Number(currentPage) - 1).removeClass("active");
   var page = $(this).attr("page");
   page = Number(page);
@@ -128,13 +163,18 @@ $("#pageNumArea").on('click', '.page_num', function(event) {
   currentPage = page;
   var order = $(".order").val();
   var orderType = $(".orderType").val();
-  var url = etzrUrl + '/diary/list';
-  listPass(url, page, order, orderType);
+  var url = etzrUrl + '/diary/admin/list';
+  var userData = localStorage.getItem("userData");
+  if (!userData) {
+    return false;
+  }
+  var className = JSON.parse(userData).className;
+  listPass(url, page, order, orderType, className);
   $("#pageNumArea").find("li").eq(page - 1).addClass("active");
 });
 
 
-$("#pageNumArea-checking").on('click', '.page_num_checking', function(event) {
+$("#pageNumArea-checking").on('click', '.page_num_checking', function (event) {
   $("#pageNumArea-checking").find("li").eq(Number(currentCheckPage) - 1).removeClass("active");
   var page = $(this).attr("page");
   page = Number(page);
@@ -144,12 +184,17 @@ $("#pageNumArea-checking").on('click', '.page_num_checking', function(event) {
   currentCheckPage = page;
   var order = $(".order").val();
   var orderType = $(".orderType").val();
-  var url = etzrUrl + '/diary/list';
-  listChecking(url, page, order, orderType);
+  var url = etzrUrl + '/diary/admin/list';
+  var userData = localStorage.getItem("userData");
+  if (!userData) {
+    return false;
+  }
+  var className = JSON.parse(userData).className;
+  listChecking(url, page, order, orderType, className);
 });
 
 /*点击删除*/
-$("#diaryPass").on('click', '.delete', function(event) {
+$("#diaryPass").on('click', '.delete', function (event) {
   var theResponse = window.confirm("单击“确定”继续。单击“取消”停止。");
   if (!theResponse) {
     return false;
@@ -165,20 +210,20 @@ $("#diaryPass").on('click', '.delete', function(event) {
         token: token
       }
     })
-    .done(function(info) {
+    .done(function (info) {
       console.log(info.message);
       location.reload();
     })
-    .fail(function(info) {
+    .fail(function (info) {
       console.log(info.message);
       alert(info.message);
     })
-    .always(function() {
+    .always(function () {
       console.log("complete");
     });
 });
 
-$("#diaryNotPass").on('click', '.delete', function(event) {
+$("#diaryNotPass").on('click', '.delete', function (event) {
   var theResponse = window.confirm("单击“确定”继续。单击“取消”停止。");
   if (!theResponse) {
     return false;
@@ -194,21 +239,21 @@ $("#diaryNotPass").on('click', '.delete', function(event) {
         token: token
       }
     })
-    .done(function(info) {
+    .done(function (info) {
       console.log(info.message);
       location.reload();
     })
-    .fail(function(info) {
+    .fail(function (info) {
       console.log(info.message);
       alert(info.message);
     })
-    .always(function() {
+    .always(function () {
       console.log("complete");
     });
 });
 
 
-$("#diaryNotPass").on('click', '.pass', function(event) {
+$("#diaryNotPass").on('click', '.pass', function (event) {
   var id = $(this).attr('rel');
   $.ajax({
       url: etzrUrl + '/diary/pass',
@@ -220,22 +265,22 @@ $("#diaryNotPass").on('click', '.pass', function(event) {
         token: token
       }
     })
-    .done(function(info) {
+    .done(function (info) {
       console.log(info.message);
       location.reload();
       alert(info.message);
     })
-    .fail(function(info) {
+    .fail(function (info) {
       console.log(info.message);
       alert(info.message);
     })
-    .always(function() {
+    .always(function () {
       console.log("complete");
     });
 });
 
 /*点赞额取消点赞*/
-$("#diaryPass").on('click', '.like', function(event) {
+$("#diaryPass").on('click', '.like', function (event) {
   var id = $(this).attr('rel');
   var $this = $(this);
   var thumbsUp_flag = $(this).text();
@@ -253,17 +298,17 @@ $("#diaryPass").on('click', '.like', function(event) {
           token: token
         }
       })
-      .done(function(info) {
+      .done(function (info) {
         var new_num = info.num;
         alert(info.message);
         $this.text("取消点赞");
         $this.parent().siblings(".thumbsUp_num").text(parseInt(oldThNum) + 1);
       })
-      .fail(function(info) {
+      .fail(function (info) {
         console.log(info.message);
         alert(info.message);
       })
-      .always(function() {
+      .always(function () {
         console.log("complete");
       });
   } else {
@@ -278,17 +323,17 @@ $("#diaryPass").on('click', '.like', function(event) {
           token: token
         }
       })
-      .done(function(info) {
+      .done(function (info) {
         var new_num = info.num;
         alert(info.message);
         $this.text("点赞");
         $this.parent().siblings(".thumbsUp_num").text(parseInt(oldThNum) - 1);
       })
-      .fail(function(info) {
+      .fail(function (info) {
         console.log(info.message);
         alert(info.message);
       })
-      .always(function() {
+      .always(function () {
         console.log("complete");
       });
   }
@@ -296,19 +341,19 @@ $("#diaryPass").on('click', '.like', function(event) {
 
 
 // 退出登录
-$("#exit").on("click", function() {
+$("#exit").on("click", function () {
   $.ajax({
       url: etzrUrl + '/admin/logout',
       type: 'GET'
     })
-    .done(function(info) {
+    .done(function (info) {
       alert(info.message);
       window.location.reload();
     })
-    .fail(function() {
+    .fail(function () {
       console.log("error");
     })
-    .always(function() {
+    .always(function () {
       console.log("complete");
     });
 
@@ -316,7 +361,7 @@ $("#exit").on("click", function() {
 
 
 //选择排序规则
-$(".chooseOrderType").on("change", function() {
+$(".chooseOrderType").on("change", function () {
   var orderType = $(".chooseOrderType").val();
   $(".orderType").val(orderType);
   currentPage = 1;
@@ -327,12 +372,17 @@ $(".chooseOrderType").on("change", function() {
   var orderType = $(".orderType").val();
   console.log(orderType);
   var page = 1;
-  var url = etzrUrl + '/diary/list';
-  listPass(url, page, order, orderType);
+  var url = etzrUrl + '/diary/admin/list';
+  var userData = localStorage.getItem("userData");
+  if (!userData) {
+    return false;
+  }
+  var className = JSON.parse(userData).className;
+  listPass(url, page, order, orderType,className);
 })
 
 //选择排序方式
-$(".chooseOrder").on("change", function() {
+$(".chooseOrder").on("change", function () {
   var order = $(".chooseOrder").val();
   $(".order").val(order);
   currentPage = 1;
@@ -343,8 +393,13 @@ $(".chooseOrder").on("change", function() {
   var orderType = $(".orderType").val();
   console.log(orderType);
   var page = 1;
-  var url = etzrUrl + '/diary/list';
-  listPass(url, page, order, orderType);
+  var url = etzrUrl + '/diary/admin/list';
+  var userData = localStorage.getItem("userData");
+  if (!userData) {
+    return false;
+  }
+  var className = JSON.parse(userData).className;
+  listPass(url, page, order, orderType, className);
 })
 
 

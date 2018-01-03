@@ -3,10 +3,16 @@ var currentPage;
 var currentCommentPage;
 
 $(document).ready(function() {
+  var userData = localStorage.getItem('userData');
+  var name = JSON.parse(userData).name;
+  $(".username").empty().text(name);
   var page = 1;
   currentPage = 1;
-  var year = "2017";
-  var url = etzrUrl + '/finework/list';
+  // 获得当前日期
+  var today = new Date();
+  // 获得年份
+  var year = today.getFullYear();
+  var url = etzrUrl + '/finework/admin/list';
   $.ajax({
       url: url,
       type: 'POST',
@@ -19,6 +25,10 @@ $(document).ready(function() {
       }
     })
     .done(function(info) {
+      if (!info.flag) {
+        $("#fineworkList").empty().append('<tr><td colspan="5">查询错误</td></tr>');
+        return false;
+      }
       if (!info.data) {
         $("#fineworkList").empty().append('<tr><td colspan="5">无数据</td></tr>');
         return false;
@@ -40,7 +50,7 @@ $(document).ready(function() {
         } else {
           imgStr = '<a style="margin-right:10px;" href="' + el.resource_url + '" target="_blank"><img alt="无法显示" src="' + el.resource_url + '" style="width:40px;"></a>';
         }
-        var str = '<tr id="' + el.id + '"><td>' + el.real_name + '</td><td>' + el.title + '</td><td>' + el.content + '</td><td>' + imgStr + '</td><td><button class="btn btn-danger delete" rel="' + el.id + '">删除</button><button class="btn btn-primary more" rel="' + el.id + '">详情</button></td></tr>'
+        var str = '<tr id="' + el.id + '"><td>' + name + '</td><td>' + el.title + '</td><td>' + el.content + '</td><td>' + imgStr + '</td><td><button class="btn btn-danger delete" rel="' + el.id + '">删除</button><button class="btn btn-primary more" rel="' + el.id + '">详情</button></td></tr>'
         fineworkStr += str;
       });
       $("#fineworkList").empty().append(fineworkStr);
@@ -94,6 +104,8 @@ function submit() {
 
 /*点击页码*/
 $("#fineworkPageNum").on("click", ".page_num", function() {
+  var userData = localStorage.getItem('userData');
+  var name = JSON.parse(userData).name;
   $("#fineworkPageNum").find("li").eq(Number(currentPage) - 1).removeClass("active");
   var page = $(this).attr("page");
   page = Number(page);
@@ -102,7 +114,7 @@ $("#fineworkPageNum").on("click", ".page_num", function() {
   }
   currentPage = page;
   var year = $("#recordYear").val();
-  var url = etzrUrl + '/finework/list';
+  var url = etzrUrl + '/finework/admin/list';
   $.ajax({
       url: url,
       type: 'POST',
@@ -115,6 +127,10 @@ $("#fineworkPageNum").on("click", ".page_num", function() {
       }
     })
     .done(function(info) {
+      if (!info.flag) {
+        $("#fineworkList").empty().append('<tr>查询错误</tr>');
+        return false;
+      }
       if (!info.data) {
         $("#fineworkList").empty().append('<tr>列表为空</tr>');
         return false;
@@ -135,7 +151,7 @@ $("#fineworkPageNum").on("click", ".page_num", function() {
         } else {
           imgStr = '<a style="margin-right:10px;" href="' + el.resource_url + '" target="_blank"><img alt="无法显示" src="' + el.resource_url + '" style="width:40px;"></a>';
         }
-        var str = '<tr id="' + el.id + '"><td>' + el.real_name + '</td><td>' + el.title + '</td><td>' + el.content + '</td><td>' + imgStr + '</td><td><button class="btn btn-danger delete" rel="' + el.id + '">删除</button><button class="btn btn-primary more" rel="' + el.id + '">详情</button></td></tr>'
+        var str = '<tr id="' + el.id + '"><td>' + name + '</td><td>' + el.title + '</td><td>' + el.content + '</td><td>' + imgStr + '</td><td><button class="btn btn-danger delete" rel="' + el.id + '">删除</button><button class="btn btn-primary more" rel="' + el.id + '">详情</button></td></tr>'
         fineworkStr += str;
       });
       $("#fineworkList").empty().append(fineworkStr);
@@ -326,12 +342,14 @@ $("#commentList").on('click', '.commentDelete', function(event) {
 
 
 $("#choose-year").on("change", function() {
+  var userData = localStorage.getItem('userData');
+  var name = JSON.parse(userData).name;
   var choose_year = $("#choose-year").val();
   console.log(choose_year);
   var page = 1;
   currentPage = 1;
   $("#recordYear").val(choose_year);
-  var url = etzrUrl + '/finework/list';
+  var url = etzrUrl + '/finework/admin/list';
   $.ajax({
       url: url,
       type: 'POST',
@@ -344,6 +362,10 @@ $("#choose-year").on("change", function() {
       }
     })
     .done(function(info) {
+      if (!info.flag) {
+        $("#fineworkList").empty().append('<tr>查询错误</tr>');
+        return false;
+      }
       if (!info.data) {
         $("#fineworkList").empty().append('<tr>列表为空</tr>');
         return false;
@@ -364,7 +386,7 @@ $("#choose-year").on("change", function() {
         } else {
           imgStr = '<a style="margin-right:10px;" href="' + el.resource_url + '" target="_blank"><img alt="无法显示" src="' + el.resource_url + '" style="width:40px;"></a>';
         }
-        var str = '<tr id="' + el.id + '"><td>' + el.real_name + '</td><td>' + el.title + '</td><td>' + el.content + '</td><td>' + imgStr + '</td><td><button class="btn btn-danger delete" rel="' + el.id + '">删除</button><button class="btn btn-primary more" rel="' + el.id + '">详情</button></td></tr>'
+        var str = '<tr id="' + el.id + '"><td>' + name + '</td><td>' + el.title + '</td><td>' + el.content + '</td><td>' + imgStr + '</td><td><button class="btn btn-danger delete" rel="' + el.id + '">删除</button><button class="btn btn-primary more" rel="' + el.id + '">详情</button></td></tr>'
         fineworkStr += str;
       });
       $("#fineworkList").empty().append(fineworkStr);

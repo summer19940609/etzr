@@ -1,3 +1,4 @@
+var localStorage = window.localStorage;
 $("#LoginBtn").on("click", function() {
   var adminName = $("#username").val();
   var password = $("#password").val();
@@ -16,6 +17,7 @@ $("#LoginBtn").on("click", function() {
         return false;
       }
       var roleType = info.data.userData.roleType;
+      localStorage.setItem("userData",JSON.stringify(info.data.userData));
       console.log(roleType);
       if (roleType != 2) {
         alert("你不是老师！");

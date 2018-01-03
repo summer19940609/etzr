@@ -1,5 +1,5 @@
 module.exports = function(sequelize, DataTypes) {
-  return sequelize.define('User_table', {
+  return sequelize.define('user_table', {
     user_id: {
       type: DataTypes.STRING,
       allowNull: false,

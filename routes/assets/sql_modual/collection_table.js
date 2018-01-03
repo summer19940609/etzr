@@ -1,5 +1,5 @@
 module.exports = function(sequelize, DataTypes) {
-  return sequelize.define('Collection_table', {
+  return sequelize.define('collection_table', {
     parent_id: {
       type: DataTypes.STRING,
       allowNull: true,

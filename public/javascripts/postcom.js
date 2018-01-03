@@ -4,7 +4,16 @@ var currentCommentPage;
 $(document).ready(function() {
   var page = 1;
   currentPage = 1;
-  var url = etzrUrl + '/postcom/list';
+  var url = etzrUrl + '/postcom/admin/list';
+  var userData = localStorage.getItem("userData");
+  if (!userData) {
+    return false;
+  }
+  var className = JSON.parse(userData).className;
+  var name = JSON.parse(userData).name;
+  $(".username").empty().text(name);
+  var classNameArr = className.split(',');
+  classNameArr.push(className);
   $.ajax({
       url: url,
       type: 'POST',
@@ -12,12 +21,17 @@ $(document).ready(function() {
       data: {
         page: page,
         order: "DESC",
-        orderType: "update_time",
+        orderType: "p.update_time",
         user_id: user_id,
-        token: token
+        token: token,
+        className: classNameArr
       }
     })
     .done(function(info) {
+      if (!info.data) {
+        $("#postcomList").empty().append('<tr><td colspan="5">查询错误</td></tr>');
+        return false;
+      }
       if (!info.data) {
         $("#postcomList").empty().append('<tr><td colspan="5">列表为空</td></tr>');
         return false;
@@ -35,9 +49,9 @@ $(document).ready(function() {
         if (!el.imgData.length) {
           imgStr = "无图片";
         } else {
-          var imgData = JSON.parse(JSON.stringify(el.imgData));
+          var imgData = el.imgData.split(',');
           for (var i = 0; i < imgData.length; i++) {
-            imgStr += '<a style="margin-right:10px;" href="' + imgData[i].resource_url + '" target="_blank"><img alt="无法显示" src="' + imgData[i].resource_url + '" style="width:40px;"></a>';
+            imgStr += '<a style="margin-right:10px;" href="' + imgData[i] + '" target="_blank"><img alt="无法显示" src="' + imgData[i] + '" style="width:40px;"></a>';
           }
         }
         postcomStr += '<tr id="' + el.id + '"><td>' + el.real_name + '</td><td>' + el.title + '</td><td class="content-overflow">' + el.content + '</td><td>' + imgStr + '</td><td><button class="btn btn-danger delete" rel="' + el.id + '">删除</button><button class="btn btn-primary more" rel="' + el.id + '">详情</button></td></tr>'
@@ -97,7 +111,14 @@ $("#postcomPageNum").on('click', '.page_num', function() {
   currentPage = page;
   var orderType = $(".orderType").val();
   var order = $(".order").val();
-  var url = etzrUrl + '/postcom/list';
+  var userData = localStorage.getItem("userData");
+  if (!userData) {
+    return false;
+  }
+  var className = JSON.parse(userData).className;
+  var classNameArr = className.split(',');
+  classNameArr.push(className);
+  var url = etzrUrl + '/postcom/admin/list';
   $.ajax({
       url: url,
       type: 'POST',
@@ -107,10 +128,15 @@ $("#postcomPageNum").on('click', '.page_num', function() {
         order: order,
         orderType: orderType,
         user_id: user_id,
-        token: token
+        token: token,
+        className: classNameArr
       }
     })
     .done(function(info) {
+      if (!info.flag) {
+        $("#postcomList").empty().append('<tr><td colspan="5">查询错误</td></tr>');
+        return false;
+      }
       if (!info.data) {
         $("#postcomList").empty().append('<tr><td colspan="5">列表为空</td></tr>');
         return false;
@@ -128,9 +154,9 @@ $("#postcomPageNum").on('click', '.page_num', function() {
         if (!el.imgData.length) {
           imgStr = "无图片";
         } else {
-          var imgData = JSON.parse(JSON.stringify(el.imgData));
+          var imgData = el.imgData.split(',');
           for (var i = 0; i < imgData.length; i++) {
-            imgStr += '<a style="margin-right:10px;" href="' + imgData[i].resource_url + '" target="_blank"><img alt="无法显示" src="' + imgData[i].resource_url + '" style="width:40px;"></a>';
+            imgStr += '<a style="margin-right:10px;" href="' + imgData[i] + '" target="_blank"><img alt="无法显示" src="' + imgData[i] + '" style="width:40px;"></a>';
           }
         }
         postcomStr += '<tr id="' + el.id + '"><td>' + el.real_name + '</td><td>' + el.title + '</td><td class="content-overflow">' + el.content + '</td><td>' + imgStr + '</td><td><button class="btn btn-danger delete" rel="' + el.id + '">删除</button><button class="btn btn-primary more" rel="' + el.id + '">详情</button></td></tr>'
@@ -270,6 +296,9 @@ $("#commentPageNum").on('click', '.compage_num', function(event) {
     })
     .done(function(info) {
       var commentDataStr = "";
+      if (!info.flag) {
+        commentDataStr = '<tr><td colspan="3">查询错误</td></tr>'
+      }
       var commentData = info.data;
       if (!commentData) {
         commentDataStr = '<tr><td colspan="3">无评论信息</td></tr>'
@@ -366,12 +395,18 @@ $(".chooseOrderType").on("click", function() {
 
   //当前的排序规则和顺序
   var order = $(".order").val();
-  console.log(order);
   var orderType = $(".orderType").val();
-  console.log(orderType);
   var page = 1;
   currentPage =1;
-  var url = etzrUrl + '/postcom/list';
+  var userData = localStorage.getItem("userData");
+  if (!userData) {
+    return false;
+  }
+  var className = JSON.parse(userData).className;
+  var classNameArr = className.split(',');
+  classNameArr.push(className);
+  var url = etzrUrl + '/postcom/admin/list';
+
   $.ajax({
       url: url,
       type: 'POST',
@@ -381,10 +416,15 @@ $(".chooseOrderType").on("click", function() {
         order: order,
         orderType: orderType,
         user_id: user_id,
-        token: token
+        token: token,
+        className: classNameArr
       }
     })
     .done(function(info) {
+      if (!info.flag) {
+        $("#postcomList").empty().append('<tr><td colspan="5">查询错误</td></tr>');
+        return false;
+      }
       if (!info.data) {
         $("#postcomList").empty().append('<tr><td colspan="5">列表为空</td></tr>');
         return false;
@@ -402,9 +442,9 @@ $(".chooseOrderType").on("click", function() {
         if (!el.imgData.length) {
           imgStr = "无图片";
         } else {
-          var imgData = JSON.parse(JSON.stringify(el.imgData));
+          var imgData = el.imgData.split(',');
           for (var i = 0; i < imgData.length; i++) {
-            imgStr += '<a style="margin-right:10px;" href="' + imgData[i].resource_url + '" target="_blank"><img alt="无法显示" src="' + imgData[i].resource_url + '" style="width:40px;"></a>';
+            imgStr += '<a style="margin-right:10px;" href="' + imgData[i] + '" target="_blank"><img alt="无法显示" src="' + imgData[i] + '" style="width:40px;"></a>';
           }
         }
         postcomStr += '<tr id="' + el.id + '"><td>' + el.real_name + '</td><td>' + el.title + '</td><td class="content-overflow">' + el.content + '</td><td>' + imgStr + '</td><td><button class="btn btn-danger delete" rel="' + el.id + '">删除</button><button class="btn btn-primary more" rel="' + el.id + '">详情</button></td></tr>'
@@ -429,7 +469,14 @@ $(".chooseOrder").on("change", function() {
   var orderType = $(".orderType").val();
   console.log(orderType);
   var page = 1;
-  var url = etzrUrl + '/postcom/list';
+  var userData = localStorage.getItem("userData");
+  if (!userData) {
+    return false;
+  }
+  var className = JSON.parse(userData).className;
+  var classNameArr = className.split(',');
+  classNameArr.push(className);
+  var url = etzrUrl + '/postcom/admin/list';
   $.ajax({
       url: url,
       type: 'POST',
@@ -439,10 +486,15 @@ $(".chooseOrder").on("change", function() {
         order: order,
         orderType: orderType,
         user_id: user_id,
-        token: token
+        token: token,
+        className: classNameArr
       }
     })
     .done(function(info) {
+      if (!info.flag) {
+        $("#postcomList").empty().append('<tr><td colspan="5">查询错误</td></tr>');
+        return false;
+      }
       if (!info.data) {
         $("#postcomList").empty().append('<tr><td colspan="5">列表为空</td></tr>');
         return false;
@@ -460,9 +512,9 @@ $(".chooseOrder").on("change", function() {
         if (!el.imgData.length) {
           imgStr = "无图片";
         } else {
-          var imgData = JSON.parse(JSON.stringify(el.imgData));
+          var imgData = el.imgData.split(',');
           for (var i = 0; i < imgData.length; i++) {
-            imgStr += '<a style="margin-right:10px;" href="' + imgData[i].resource_url + '" target="_blank"><img alt="无法显示" src="' + imgData[i].resource_url + '" style="width:40px;"></a>';
+            imgStr += '<a style="margin-right:10px;" href="' + imgData[i] + '" target="_blank"><img alt="无法显示" src="' + imgData[i] + '" style="width:40px;"></a>';
           }
         }
         postcomStr += '<tr id="' + el.id + '"><td>' + el.real_name + '</td><td>' + el.title + '</td><td class="content-overflow">' + el.content + '</td><td>' + imgStr + '</td><td><button class="btn btn-danger delete" rel="' + el.id + '">删除</button><button class="btn btn-primary more" rel="' + el.id + '">详情</button></td></tr>'

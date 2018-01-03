@@ -1,5 +1,5 @@
 module.exports = function(sequelize, DataTypes) {
-  return sequelize.define('User_etzr', {
+  return sequelize.define('user_etzr', {
     user_id: {
       type: DataTypes.STRING,
       allowNull: false,
@@ -16,6 +16,13 @@ module.exports = function(sequelize, DataTypes) {
     },
     role_type: {
       type: DataTypes.INTEGER(10),
+      allowNull: true,
+      autoIncrement: false,
+      primaryKey: false,
+      defaultValue: 0
+    },
+    class: {
+      type: DataTypes.STRING,
       allowNull: true,
       autoIncrement: false,
       primaryKey: false,
